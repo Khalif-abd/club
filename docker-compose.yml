@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+    php-fpm:
+        container_name: ${APP_NAME}-php-fpm
+        build:
+            context: .
+            dockerfile: docker/php-fpm/Dockerfile
+        volumes:
+            - ./:/app
+        depends_on:
+            - db
+        restart: always
+    nginx:
+        container_name: ${APP_NAME}-nginx
+        build:
+            context: .
+            dockerfile: docker/nginx/Dockerfile
+        volumes:
+            - ./:/app
+        ports:
+            - "80:80"
+        depends_on:
+            - php-fpm
+
+    db:
+        image: postgres:latest
+        container_name: ${APP_NAME}-postgres
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_USER=root
+            - POSTGRES_PASSWORD=root
+            - POSTGRES_DB=db
